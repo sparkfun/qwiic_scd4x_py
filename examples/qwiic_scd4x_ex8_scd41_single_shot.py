@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 #-------------------------------------------------------------------------------
-# qwiic_template_ex1_title.py TODO: replace template and title
+# qwiic_scd4x_ex8_scd41_single_shot.py
 #
-# TODO: Add description for this example
+# This example shows how to perform single-shot data acquisition on the SCD41 sensor.
+# 
 #-------------------------------------------------------------------------------
-# Written by SparkFun Electronics, TODO: month and year
+# Written by SparkFun Electronics, December 2024
 #
 # This python library supports the SparkFun Electroncis Qwiic ecosystem
-#
+# 
 # More information on Qwiic is at https://www.sparkfun.com/qwiic
 #
 # Do you like this library? Help support SparkFun. Buy a board!
@@ -33,26 +34,60 @@
 # SOFTWARE.
 #===============================================================================
 
-import qwiic_template # TODO Import correct package
+import qwiic_scd4x
 import sys
+import time
 
 def runExample():
-	# TODO Replace template and title
-	print("\nQwiic Template Example 1 - Title\n")
+	print("\nQwiic SCD4x Example 8 - SCD41 Single-Shot\n")
 
 	# Create instance of device
-	myDevice = qwiic_template.QwiicTemplate() # TODO update as needed
+	mySCD4x = qwiic_scd4x.QwiicSCD4x() 
 
 	# Check if it's connected
-	if myDevice.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
+	if mySCD4x.is_connected() == False:
+		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
 		return
 
-	# Initialize the device
-	myDevice.begin()
+	# Initialize the device (NOTE: we do not start periodic measurements)
+	if mySCD4x.begin(measBegin=False) == False:
+		print("Error while initializing device", file=sys.stderr)
+		return
+	
+	# Lets call measure_single_shot to start the first conversion
+	if mySCD4x.measure_single_shot() == False:
+		print("Error while starting single-shot measurement. Are you sure your device is a SCD41 and is connected?", file=sys.stderr)
+		return
 
-	# TODO Add basic example code
+	while True:
+		# Wait for the measurement to be ready
+		while mySCD4x.read_measurement() == False:
+			print(".", end="")
+			time.sleep(0.5)
+		
+		# Print the single-shot data
+		print("\nCO2(ppm):", mySCD4x.get_co2())
+		print("Temperature(C):", mySCD4x.get_temperature())
+		print("Humidity(%RH):", mySCD4x.get_humidity())
+
+		# Request just the RH and the Temperature (should take ~50ms)
+		if mySCD4x.measure_single_shot_rht_only() == False:
+			print("Failed to start single-shot RHT measurement", file=sys.stderr)
+			return
+
+		# Wait for the measurement to be ready
+		while mySCD4x.read_measurement() == False:
+			print(".", end="")
+			time.sleep(0.005)
+
+		# Print the single-shot data
+		print("\nTemperature(C):", mySCD4x.get_temperature())
+		print("Humidity(%RH):", mySCD4x.get_humidity())
+
+		# Do a single shot request for all the data (should take ~5seconds)
+		if mySCD4x.measure_single_shot() == False:
+			print("Failed to start single-shot measurement", file=sys.stderr)
+			return
 
 if __name__ == '__main__':
 	try:
