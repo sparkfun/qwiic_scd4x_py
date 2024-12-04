@@ -174,7 +174,7 @@ class QwiicSCD4x(object):
         success &= (serial_number is not None)
         
         if pollAndSetDeviceType:
-            success &= self.get_feature_set_version(True)
+            success &= self.get_feature_set_version()
         
         success &= self.set_automatic_self_calibration_enabled(autoCalibrate)
         success &= (self.get_automatic_self_calibration_enabled() == autoCalibrate)
@@ -200,8 +200,7 @@ class QwiicSCD4x(object):
         :param delayMillis: The delay in milliseconds to wait after stopping the measurement
         :type delayMillis: int
         """
-        bytes_to_write = [self.kComStopPeriodicMeasurement >> 8, self.kComStopPeriodicMeasurement & 0xFF]
-        self._i2c.writeBlock(self.address, bytes_to_write)
+        self.send_command(self.kComStopPeriodicMeasurement)
         self._doingPeriodicMeasurement = False
         time.sleep(delayMillis / 1000)
     
@@ -221,15 +220,14 @@ class QwiicSCD4x(object):
         if self.get_data_ready_status() == False:
             return False
 
-        bytes_to_write = [self.kComReadMeasurement >> 8, self.kComReadMeasurement & 0xFF]
-        self._i2c.writeBlock(self.address, bytes_to_write)
+        self.send_command(self.kComReadMeasurement)
 
         time.sleep(0.001) # specified by datasheet
 
         bytes_read = self._i2c.readBlock(self.address, None, 9) # By passing "None" we perform a general read. Requires new version of qwiic_i2c
         co2_bytes = bytes_read[0:3]
-        humidity_bytes = bytes_read[3:6]
-        temperature_bytes = bytes_read[6:9]
+        temperature_bytes = bytes_read[3:6]
+        humidity_bytes = bytes_read[6:9]
 
         # Check CRC's
         for bytes in [co2_bytes, humidity_bytes, temperature_bytes]:
@@ -299,7 +297,7 @@ class QwiicSCD4x(object):
         if offset < 0 or offset >= 175:
             return False
         
-        offset_word = offset * 65536 / 175 # Toffset [°C] * 2^16 / 175
+        offset_word = int(offset * 65536 / 175) # Toffset [°C] * 2^16 / 175
         self.send_command(self.kComSetTemperatureOffset, offset_word)
         
         if delayMillis > 0:
@@ -380,7 +378,7 @@ class QwiicSCD4x(object):
         if pressure < 0 or pressure >= 6553500:
             return False
 
-        pressure_word = pressure / 100
+        pressure_word = int(pressure / 100)
         self.send_command(self.kComSetAmbientPressure, pressure_word)
         if delayMillis > 0:
             time.sleep(delayMillis / 1000)
@@ -421,7 +419,7 @@ class QwiicSCD4x(object):
 
         return (correction != 0xFFFF)
     
-    def start_low_power_periodic_measurent(self):
+    def start_low_power_periodic_measurement(self):
         """
         Start low power periodic measurements. See 3.8.1
         Signal update interval will be 30 seconds instead of 5
@@ -491,8 +489,7 @@ class QwiicSCD4x(object):
         if self._doingPeriodicMeasurement:
             return None
         
-        bytes_to_write = [self.kComGetSerialNumber >> 8, self.kComGetSerialNumber & 0xFF]
-        self._i2c.writeBlock(self.address, bytes_to_write)
+        self.send_command(self.kComGetSerialNumber)
         
         time.sleep(0.001) # specified by datasheet
 
@@ -510,6 +507,8 @@ class QwiicSCD4x(object):
                 return None
             serial += self.convert_hex_to_ascii(bytes[0] >> 4)
             serial += self.convert_hex_to_ascii(bytes[0] & 0x0F)
+            serial += self.convert_hex_to_ascii(bytes[1] >> 4)
+            serial += self.convert_hex_to_ascii(bytes[1] & 0x0F)
         
         return serial
     
@@ -755,11 +754,13 @@ class QwiicSCD4x(object):
         bytes_to_write = [command >> 8, command & 0xFF]
         
         if arguments is not None:
-            arguments_to_wrte = [arguments >> 8, arguments & 0xFF]
+            arguments_to_wrte = [int(arguments) >> 8, int(arguments) & 0xFF]
             crc = self.compute_crc8(arguments_to_wrte)
             bytes_to_write += [arguments_to_wrte[0], arguments_to_wrte[1], crc]
         
-        self._i2c.writeBlock(self.address, bytes_to_write)
+        # we don't have an explicit way in the I2C drivers to write not to a specific register, 
+        # but if we write the first as the register it should behave the same
+        self._i2c.writeBlock(self.address, bytes_to_write[0], bytes_to_write[1:])
 
     def read_register(self, registerAddress, delayMillis = 1):
         """
@@ -774,8 +775,7 @@ class QwiicSCD4x(object):
         :return: The value of the register if successful, otherwise `None`
         :rtype: int
         """
-        bytes_to_write = [registerAddress >> 8, registerAddress & 0xFF]
-        self._i2c.writeBlock(self.address, bytes_to_write)
+        self.send_command(registerAddress)
         
         time.sleep(delayMillis / 1000)
 
@@ -785,14 +785,3 @@ class QwiicSCD4x(object):
             return None
         
         return (bytes_read[0] << 8) | bytes_read[1]
-
-        
-
-
-
-    
-
-
-    
-
-

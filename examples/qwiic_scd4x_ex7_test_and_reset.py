@@ -59,7 +59,7 @@ def runExample():
 	print("Periodic measurements stopped")
 
 	# Now we can run the self test:
-	print("Starthing the self-test. This will take 10 seconds to complete...")
+	print("Starting the self-test. This will take 10 seconds to complete...")
 	if mySCD4x.perform_self_test() == True:
 		print("Self-test passed!")
 	else:
