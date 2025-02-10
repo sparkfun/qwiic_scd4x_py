@@ -1,9 +1,13 @@
 {
     "urls": [
-      ["qwiic_scd4x.py", "github:sparkfun/Qwiic_SCD4x_Py/qwiic_scd4x.py"]
-    ],
-    "deps": [
-      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+      ["qwiic_scd4x_py_examples/qwiic_scd4x_ex1_basic.py", "github:sparkfun/qwiic_scd4x_py/examples/qwiic_scd4x_ex1_basic.py"],
+      ["qwiic_scd4x_py_examples/qwiic_scd4x_ex2_low_power.py", "github:sparkfun/qwiic_scd4x_py/examples/qwiic_scd4x_ex2_low_power.py"],
+      ["qwiic_scd4x_py_examples/qwiic_scd4x_ex3_disable_auto_calibration.py", "github:sparkfun/qwiic_scd4x_py/examples/qwiic_scd4x_ex3_disable_auto_calibration.py"],
+      ["qwiic_scd4x_py_examples/qwiic_scd4x_ex4_skip_stop_periodic.py", "github:sparkfun/qwiic_scd4x_py/examples/qwiic_scd4x_ex4_skip_stop_periodic.py"],
+      ["qwiic_scd4x_py_examples/qwiic_scd4x_ex6_signal_compensation.py", "github:sparkfun/qwiic_scd4x_py/examples/qwiic_scd4x_ex6_signal_compensation.py"],
+      ["qwiic_scd4x_py_examples/qwiic_scd4x_ex7_test_and_reset.py", "github:sparkfun/qwiic_scd4x_py/examples/qwiic_scd4x_ex7_test_and_reset.py"],
+      ["qwiic_scd4x_py_examples/qwiic_scd4x_ex8_scd41_single_shot.py", "github:sparkfun/qwiic_scd4x_py/examples/qwiic_scd4x_ex8_scd41_single_shot.py"],
+      ["qwiic_scd4x_py_examples/qwiic_scd4x_ex9_sensor_type.py", "github:sparkfun/qwiic_scd4x_py/examples/qwiic_scd4x_ex9_sensor_type.py"]
     ],
     "version": "1.0.0"
 }
