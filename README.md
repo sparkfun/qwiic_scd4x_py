@@ -23,7 +23,7 @@ This repository implements a Python package for the SparkFun Qwiic SCD4X. This p
 
 ## About the Package
 
-This python package enables the user to access the features of the SCD4X via a single Qwiic cable. This includes <reading CO2, reading temperature, reading humidity> and more. The capabilities of the SCD4X are each demonstrated in the included examples.
+This python package enables the user to access the features of the SCD4X via a single Qwiic cable. This includes reading CO2, reading temperature, reading humidity and more. The capabilities of the SCD4X are each demonstrated in the included examples.
 
 New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.sparkfun.com/qwiic).
 
@@ -81,7 +81,7 @@ mpremote mip install github:sparkfun/qwiic_scd4x_py
 
 If you would also like to install the examples for this repository, issue the following mip command as well:
 ```sh
-mprmeote mip install github:sparkfun/qwiic_scd4x_py@examples
+mpremote mip install --target "" github:sparkfun/qwiic_scd4x_py@examples
 ```
 
 ### CircuitPython Installation
