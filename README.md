@@ -115,7 +115,7 @@ Example Use
  ---------------
 Below is a quickstart program to print readings from the SCD4X.
 
-See the examples directory for more detailed use examples and [examples/README.md](https://github.com/sparkfun/qwiic_scd4x_py/blob/main/examples/README.md) for a summary of the available examples.
+See the examples directory for more detailed use examples and [examples/README.md](https://github.com/sparkfun/qwiic_scd4x_py/blob/master/examples/README.md) for a summary of the available examples.
 
 ```python
 
